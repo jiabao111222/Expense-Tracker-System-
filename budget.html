@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" href="corp-interest-expenses-svgrepo-com.svg" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Set Budget</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --background-color: #f4f4f4;
+            --text-color: #333;
+            --error-color: #e74c3c;
+            --success-color: #27ae60;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 2rem 1rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 2rem;
+        }
+
+        .container {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 2rem;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        form {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        input, select {
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+        button {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        button:hover {
+            background-color: var(--success-color);
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .budget-summary {
+            background-color: #f8f9fa;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            margin-top: 2rem;
+        }
+
+        .budget-summary h2 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .budget-total {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .budget-chart {
+            height: 20px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .budget-chart-fill {
+            height: 100%;
+            background-color: var(--secondary-color);
+            width: 0%;
+            transition: width 0.5s ease-out;
+        }
+
+        .budget-history {
+            margin-top: 2rem;
+        }
+
+        .budget-history h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .budget-history ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .budget-history li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        footer {
+            background-color: #34495e;
+            color: #ecf0f1;
+            text-align: center;
+            padding: 1rem;
+            margin-top: auto;
+        }
+
+        @media (max-width: 768px) {
+            header {
+                padding: 1.5rem 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .container {
+                padding: 1.5rem;
+            }
+
+            form {
+                gap: 1rem;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .container {
+            animation: fadeIn 0.5s ease-out;
+        }
+    </style>
+</head>
+<body>
+
+    
+    <header>
+        <div class="header-container" style="display: flex; align-items: center; justify-content: flex-start; width: 100%;">
+            <button id="home-button" style="margin-right: 0.5rem;">
+                <i class="fas fa-home"></i> Home
+            </button>
+            <h1 style="margin: 0; margin-left: 33rem;">Set Your Budget</h1> <!-- add margin-left -->
+        </div>
+    </header>
+    
+    
+    
+    
+    
+    
+
+    <main>
+        <div class="container">
+            <form id="budget-form">
+                <div class="form-group">
+                    <label for="budget_amount">Monthly Budget:</label>
+                    <input type="number" name="budget_amount" id="budget_amount" required min="0" step="0.01" placeholder="Enter amount">
+                </div>
+
+                <div class="form-group">
+                    <label for="budget_month">Budget Month:</label>
+                    <input type="month" name="budget_month" id="budget_month" required>
+                </div>
+
+          
+
+    
+
+                <button type="submit">
+                    <i class="fas fa-save"></i> Set Budget
+                </button>
+            </form>
+
+            <div class="budget-summary">
+                <h2>Current Monthly Budget</h2>
+                <div class="budget-total" id="budget-total">$0.00</div>
+                <div class="budget-chart">
+                    <div class="budget-chart-fill" id="budget-chart-fill"></div>
+                </div>
+            </div>
+
+            <div class="budget-history">
+                <h3>Budget History</h3>
+                <ul id="budget-history-list">
+                    <!-- Budget history will be populated here -->
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>This is a fictitious business and part of a university course.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('budget-form');
+            const budgetAmountInput = document.getElementById('budget_amount');
+            const budgetMonthInput = document.getElementById('budget_month');
+            const categorySelect = document.getElementById('category');
+            const categoryAmountInput = document.getElementById('category_amount');
+            const budgetTotalElement = document.getElementById('budget-total');
+            const budgetChartFill = document.getElementById('budget-chart-fill');
+            const budgetHistoryList = document.getElementById('budget-history-list');
+
+
+           
+         
+
+         
+         const homeButton = document.getElementById('home-button');
+         
+         homeButton.addEventListener('click', function() {
+             window.location.href = 'index.html';
+         });
+    
+
+            let currentBudget = 0;
+            let budgetHistory = [];
+            let categoryAllocations = {};
+
+            // Set default month to current month
+            const today = new Date();
+            budgetMonthInput.value = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}`;
+
+            form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const budgetAmount = parseFloat(budgetAmountInput.value);
+    const budgetMonth = budgetMonthInput.value;
+
+    if (!isNaN(budgetAmount)) {
+        // AJAX 请求发送到 PHP 后端
+        fetch('http://localhost:8000/budget.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                'budget_amount': budgetAmount,
+                'budget_month': budgetMonth
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                currentBudget = budgetAmount;
+                budgetTotalElement.textContent = `$${currentBudget.toFixed(2)}`;
+                budgetChartFill.style.width = '100%';
+                budgetHistory.unshift({ month: budgetMonth, amount: budgetAmount });
+                updateBudgetHistory();
+                form.reset();
+                budgetMonthInput.value = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}`;
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('There was an error saving the budget.');
+        });
+    }
+});
+
+
+            function updateBudgetHistory() {
+                budgetHistoryList.innerHTML = '';
+                budgetHistory.slice(0, 5).forEach(entry => {
+                    const li = document.createElement('li');
+                    li.textContent = `${entry.month}: $${entry.amount.toFixed(2)}`;
+                    budgetHistoryList.appendChild(li);
+                });
+            }
+
+            function updateCategoryAllocations() {
+                console.log('Category Allocations:', categoryAllocations);
+                // You can add a visual representation of category allocations here
+            }
+        });
+    </script>
+</body>
+</html>

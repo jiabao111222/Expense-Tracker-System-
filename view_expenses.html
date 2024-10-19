@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" href="record-square-svgrepo-com.svg" type="image/x-icon">
+    <meta charset="UTF-8">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Expenses</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        header {
+            background-color: #3498db;
+            color: #fff;
+            text-align: center;
+            padding: 1rem;
+        }
+        h1 {
+            margin-bottom: 1rem;
+        }
+        main {
+            padding: 1rem 2rem;
+            flex: 1;
+        }
+        .filter-container {
+            margin-bottom: 1rem;
+        }
+        .filter-container label {
+            margin-right: 0.5rem;
+            font-weight: bold;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 2rem;
+        }
+        th, td {
+            padding: 0.5rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+        tfoot td {
+            font-weight: bold;
+            background-color: #ecf0f1;
+        }
+        button {
+            background-color: #2ecc71;
+            color: white;
+            padding: 0.7rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #27ae60;
+        }
+        footer {
+            text-align: center;
+            padding: 1rem;
+            background-color: #34495e;
+            color: #ecf0f1;
+        }
+        .chart-container {
+            display: flex;
+            justify-content: flex-start;
+            align-items: flex-start;
+            margin-bottom: 40px;
+            margin-left: 100px;
+            gap: 20px;
+        }
+        .chart-box {
+            width: 25%;
+            margin-left: 200px;
+        }
+        .budget-info {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+        }
+        .over-budget {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <header style="padding: 0.5rem 1rem; height: auto;">
+        <div style="display: flex; align-items: center; height: 100%;">
+            <button id="home-button" style="margin-right: auto;">
+                <i class="fas fa-home"></i> Home
+            </button>
+            <div style="margin-left: 40%; flex-grow: 1;">
+                <h1 style="text-align: left; margin: 0;">Your Expenses</h1>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="chart-container">
+            <div class="chart-box">
+                <h2>🔘 Expenditure Statistics</h2>
+                <canvas id="eventPieChart"></canvas>
+            </div>
+            <div class="chart-box">
+                <h2>📊 Spending Trends</h2>
+                <canvas id="spendingTrendsChart"></canvas>
+            </div>
+        </div>
+
+        <div class="filter-container">
+            <label for="monthFilter">Select Month:</label>
+            <select id="monthFilter">
+                <option value="all">All Months</option>
+            </select>
+        </div>
+
+        <div id="budgetInfo" class="budget-info">
+            <!-- Budget information will be displayed here -->
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Amount</th>
+                    <th>Category</th>
+                    <th>Date</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody id="data-table-body">
+                <!-- Table rows will be populated dynamically -->
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="1"></td>
+                    <td id="totalAmount" colspan="4">Total: $0.00</td>
+                </tr>
+            </tfoot>
+        </table>
+    </main>
+
+    <script>
+        let allData = []; // To store all fetched expense data
+        let budgetData = []; // To store all fetched budget data
+
+        // Function to fetch and initialize data
+        function fetchData() {
+            Promise.all([
+                fetch('http://localhost:8000/view_expenses.php').then(response => response.json()),
+                fetch('http://localhost:8000/readbudget.php').then(response => response.json())
+            ])
+            .then(([expenseData, budget]) => {
+                allData = expenseData;
+                budgetData = budget.budgets;
+                populateFilter(allData);
+                renderTable(allData);
+                renderCharts(allData);
+                updateBudgetInfo();
+            })
+            .catch(error => console.error('Error fetching data:', error));
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+         
+
+         
+            const homeButton = document.getElementById('home-button');
+            
+            homeButton.addEventListener('click', function() {
+                window.location.href = 'index.html';
+            });
+        });
+
+
+        // Function to populate the month filter dropdown
+        function populateFilter(data) {
+            const monthFilter = document.getElementById('monthFilter');
+            const months = Array.from(new Set(data.map(log => {
+                const date = new Date(log.date);
+                return date.toLocaleString('default', { month: 'long', year: 'numeric' });
+            }))).sort((a, b) => new Date(a) - new Date(b));
+
+            months.forEach(month => {
+                const option = document.createElement('option');
+                option.value = month;
+                option.textContent = month;
+                monthFilter.appendChild(option);
+            });
+
+            // Add event listener for filter change
+            monthFilter.addEventListener('change', () => {
+                const selected = monthFilter.value;
+                if (selected === 'all') {
+                    renderTable(allData);
+                    renderCharts(allData);
+                } else {
+                    const filteredData = allData.filter(log => {
+                        const date = new Date(log.date);
+                        const logMonth = date.toLocaleString('default', { month: 'long', year: 'numeric' });
+                        return logMonth === selected;
+                    });
+                    renderTable(filteredData);
+                    renderCharts(filteredData);
+                }
+                updateBudgetInfo();
+            });
+        }
+
+        // Function to render the table based on data
+        function renderTable(data) {
+            const tableBody = document.getElementById('data-table-body');
+            tableBody.innerHTML = ''; // Clear existing rows
+
+            let total = 0;
+
+            data.forEach(log => {
+                total += parseFloat(log.amount);
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${log.id}</td>
+                    <td>$${parseFloat(log.amount).toFixed(2)}</td>
+                    <td>${log.category}</td>
+                    <td>${new Date(log.date).toLocaleDateString()}</td>
+                    <td>${log.description}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            // Update total in the footer
+            document.getElementById('totalAmount').textContent = `Total: $${total.toFixed(2)}`;
+        }
+
+        // Function to render charts based on data
+        function renderCharts(data) {
+            // Prepare data for Pie Chart
+            const categoryTotals = {};
+            const dateTotals = {};
+
+            data.forEach(log => {
+                // Calculate totals per category
+                if (categoryTotals[log.category]) {
+                    categoryTotals[log.category] += parseFloat(log.amount);
+                } else {
+                    categoryTotals[log.category] = parseFloat(log.amount);
+                }
+
+                // Calculate totals per date
+                const dateKey = new Date(log.date).toLocaleDateString();
+                if (dateTotals[dateKey]) {
+                    dateTotals[dateKey] += parseFloat(log.amount);
+                } else {
+                    dateTotals[dateKey] = parseFloat(log.amount);
+                }
+            });
+
+            // Destroy existing charts if they exist to prevent duplication
+            if (window.eventPieChartInstance) {
+                window.eventPieChartInstance.destroy();
+            }
+            if (window.spendingTrendsChartInstance) {
+                window.spendingTrendsChartInstance.destroy();
+            }
+
+            // Pie Chart - Expenditure Distribution
+            const eventPieCtx = document.getElementById('eventPieChart').getContext('2d');
+            window.eventPieChartInstance = new Chart(eventPieCtx, {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(categoryTotals),
+                    datasets: [{
+                        data: Object.values(categoryTotals),
+                        backgroundColor: generateColors(Object.keys(categoryTotals).length),
+                        hoverBackgroundColor: generateColors(Object.keys(categoryTotals).length)
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Expenditure Distribution by Category'
+                        }
+                    }
+                }
+            });
+
+            // Bar Chart - Spending Trends
+            const spendingTrendsCtx = document.getElementById('spendingTrendsChart').getContext('2d');
+            window.spendingTrendsChartInstance = new Chart(spendingTrendsCtx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(dateTotals),
+                    datasets: [{
+                        label: 'Total Spending',
+                        data: Object.values(dateTotals),
+                        backgroundColor: '#36A2EB',
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Spending Trends by Date'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Total Spending ($)'
+                            },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Function to update budget information
+        function updateBudgetInfo() {
+            const monthFilter = document.getElementById('monthFilter');
+            const selectedMonth = monthFilter.value;
+            const budgetInfoElement = document.getElementById('budgetInfo');
+
+            if (selectedMonth === 'all') {
+                budgetInfoElement.innerHTML = 'Please select a specific month to view budget information.';
+                return;
+            }
+
+            const [month, year] = selectedMonth.split(' ');
+            const budgetMonth = `${year}-${String(new Date(Date.parse(month + " 1, " + year)).getMonth() + 1).padStart(2, '0')}-01`;
+            
+            const matchingBudget = budgetData.find(budget => budget.budget_month === budgetMonth);
+
+            if (matchingBudget) {
+                const budgetAmount = parseFloat(matchingBudget.budget_amount);
+                const totalExpenses = calculateTotalExpenses(selectedMonth);
+                const difference = budgetAmount - totalExpenses;
+
+                let budgetMessage = `Budget for ${selectedMonth}: $${budgetAmount.toFixed(2)}<br>`;
+                budgetMessage += `Total Expenses: $${totalExpenses.toFixed(2)}<br>`;
+                
+                if (difference >= 0) {
+                    budgetMessage += `Available Budget: $${difference.toFixed(2)}`;
+                } else {
+                    budgetMessage += `<span class="over-budget">Over Budget: $${Math.abs(difference).toFixed(2)}</span>`;
+                }
+
+                budgetInfoElement.innerHTML = budgetMessage;
+            } else {
+                budgetInfoElement.innerHTML = 'No budget recorded for this month.';
+            }
+        }
+
+        // Function to calculate total expenses for a given month
+        function calculateTotalExpenses(selectedMonth) {
+            const [month, year] = selectedMonth.split(' ');
+            const targetMonth = new Date(Date.parse(month + " 1, " + year)).getMonth();
+            const targetYear = parseInt(year);
+
+            return allData.reduce((total, expense) => {
+                const expenseDate = new Date(expense.date);
+                if (expenseDate.getMonth() === targetMonth && expenseDate.getFullYear() === targetYear) {
+                    return total + parseFloat(expense.amount);
+                }
+                return total;
+            }, 0);
+        }
+
+        // Utility function to generate random colors for the pie chart
+        function generateColors(num) {
+            const colors = [];
+            for (let i = 0; i < num; i++) {
+                const r = Math.floor(Math.random() * 255);
+                const g = Math.floor(Math.random() * 255);
+                const b = Math.floor(Math.random() * 255);
+                colors.push(`rgba(${r}, ${g}, ${b}, 0.6)`);
+            }
+            return colors;
+        }
+
+        // Initialize by fetching data
+        fetchData();
+    </script>
+
+    <footer>
+        <p>This is a fictitious business and part of a university course.</p>
+    </footer>
+</body>
+</html>

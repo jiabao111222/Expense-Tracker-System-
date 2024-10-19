@@ -1,0 +1,368 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" href="record-plus-focus-948-svgrepo-com.svg" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Record Expenses</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --background-color: #f4f4f4;
+            --text-color: #333;
+            --error-color: #e74c3c;
+            --success-color: #27ae60;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 2rem 1rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 2rem;
+        }
+
+        .container {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 2rem;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        form {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        input, select, textarea {
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1em;
+        }
+
+        button {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        button:hover {
+            background-color: var(--success-color);
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .expense-summary {
+            background-color: #f8f9fa;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .expense-summary h2 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .expense-total {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        footer {
+            background-color: #34495e;
+            color: #ecf0f1;
+            text-align: center;
+            padding: 1rem;
+            margin-top: auto;
+        }
+
+        @media (max-width: 768px) {
+            header {
+                padding: 1.5rem 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .container {
+                padding: 1.5rem;
+            }
+
+            form {
+                gap: 1rem;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .container {
+            animation: fadeIn 0.5s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <header style="padding: 0.5rem 1rem; height: auto;">
+            <div style="display: flex; align-items: center; height: 100%;">
+                <button id="home-button" style="margin-right: auto;">
+                    <i class="fas fa-home"></i> Home
+                </button>
+                <div style="margin-left: 30%; flex-grow: 1;">
+                    <h1 style="text-align: left; margin: 0;">Record Your Expense</h1>
+                </div>
+            </div>
+        </header>
+        
+        
+        
+        
+    
+    </header>
+
+    <main>
+        <div class="container">
+            <!-- success mes -->
+            <div id="success-message" style="display: none; color: var(--success-color); margin-bottom: 1rem;">
+                Expense recorded successfully!
+            </div>
+
+            <!-- custom -->
+            <div class="form-group" id="custom-category-group" style="display: none;">
+                <label for="custom-category">Custom Category:</label>
+                <input type="text" name="custom_category" id="custom-category" placeholder="Enter custom category">
+            </div>
+
+            <form action="#" method="POST" id="expense-form">
+                <div class="form-group">
+                    <label for="amount">Amount:</label>
+                    <input type="number" name="amount" id="amount" required step="0.01" min="0" placeholder="Enter amount">
+                </div>
+
+                <div class="form-group">
+                    <label for="category">Category:</label>
+                    <select name="category" id="category" required>
+                        <option value="">Select a category</option>
+                        <option value="tuition">Tuition Fee</option>
+                        <option value="assignment">Assignment/Project</option>
+                        <option value="pocket_money">Pocket Money</option>
+                        <option value="entertainment">Entertainment</option>
+                        <option value="custom">Custom</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="date">Date:</label>
+                    <input type="date" name="date" id="date" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description:</label>
+                    <textarea name="description" id="description" rows="3" placeholder="Enter a brief description"></textarea>
+                </div>
+
+                <button type="submit">
+                    <i class="fas fa-save"></i> Record Expense
+                </button>
+            </form>
+
+            <div class="expense-summary">
+                <h2>Today's Total Expenses</h2>
+                <div class="expense-total" id="expense-total">$0.00</div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>This is a fictitious business and part of a university course.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('expense-form');
+            const categorySelect = document.getElementById('category');
+            const customCategoryGroup = document.getElementById('custom-category-group');
+            const expenseTotal = document.getElementById('expense-total');
+            const dateInput = document.getElementById('date');
+            const successMessage = document.getElementById('success-message');
+
+         
+            const homeButton = document.getElementById('home-button');
+            
+            homeButton.addEventListener('click', function() {
+                window.location.href = 'index.html';
+            });
+
+
+            // hide
+            categorySelect.addEventListener('change', function() {
+                if (this.value === 'custom') {
+                    customCategoryGroup.style.display = 'block';
+                } else {
+                    customCategoryGroup.style.display = 'none';
+                }
+            });
+
+            // auto date
+            const today = new Date().toISOString().split('T')[0];
+            dateInput.value = today;
+
+            // get day expenses
+            fetch(`http://localhost:8000/get_total_expenses.php?date=${today}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        expenseTotal.textContent = `$${parseFloat(data.total).toFixed(2)}`;
+                    } else {
+                        console.error('Failed to fetch total expenses:', data.message);
+                    }
+                })
+                .catch(error => console.error('Error fetching total expenses:', error));
+
+            // send form
+            form.addEventListener('submit', function(e) {
+                e.preventDefault(); // avoid
+
+                const amount = parseFloat(document.getElementById('amount').value);
+                const category = categorySelect.value;
+                const customCategory = document.getElementById('custom-category').value.trim();
+                const date = dateInput.value;
+                const description = document.getElementById('description').value.trim();
+
+                if (isNaN(amount) || amount <= 0) {
+                    alert('Please enter a valid amount!');
+                    return;
+                }
+
+                if (category === 'custom' && customCategory === '') {
+                    alert('Please enter a custom category!');
+                    return;
+                }
+
+                const expenseData = {
+                    amount,
+                    category: category === 'custom' ? customCategory : category,
+                    date,
+                    description
+                };
+
+                // fetch diffrent server
+                fetch('http://localhost:8000/record_expenses.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(expenseData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // update expenses
+                        expenseTotal.textContent = `$${parseFloat(data.new_total).toFixed(2)}`;
+                        // show success
+                        successMessage.style.display = 'block';
+                        // hide message prevent visible
+                        setTimeout(() => {
+                            successMessage.style.display = 'none';
+                        }, 3000);
+                        // reset
+                        form.reset();
+                        dateInput.value = today;
+                        customCategoryGroup.style.display = 'none';
+                    } else {
+                        alert('Error recording expense: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error recording expense.');
+                });
+            });
+        });
+    </script>
+    
+</body>
+</html>

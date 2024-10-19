@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" href="record-svgrepo-com.svg" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Set Reminders</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --background-color: #f4f4f4;
+            --text-color: #333;
+            --error-color: #e74c3c;
+            --success-color: #27ae60;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 2rem 1rem;
+            box-shadow: var(--box-shadow);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 2rem;
+        }
+
+        .container {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 2rem;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        form {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        input[type="text"], input[type="date"] {
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        input[type="text"]:focus, input[type="date"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+        .priority-colors {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .priority-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .priority-color:hover {
+            transform: scale(1.1);
+        }
+
+        .priority-color.selected {
+            border: 2px solid var(--text-color);
+        }
+
+        button {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        button:hover {
+            background-color: var(--success-color);
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .reminders-list {
+            margin-top: 2rem;
+        }
+
+        .reminders-list h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .reminder-item {
+            background-color: #f8f9fa;
+            border-radius: var(--border-radius);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .reminder-item .priority-indicator {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 1rem;
+        }
+
+        .success-message {
+            color: blue;
+            font-weight: bold;
+            margin-top: 0.5rem;
+            text-align: center;
+            padding: 10px;
+            background-color: #e8f4fd;
+            border-radius: var(--border-radius);
+            display: none;
+        }
+
+        footer {
+            background-color: #34495e;
+            color: #ecf0f1;
+            text-align: center;
+            padding: 1rem;
+            margin-top: auto;
+        }
+
+        @media (max-width: 768px) {
+            header {
+                padding: 1.5rem 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .container {
+                padding: 1.5rem;
+            }
+
+            form {
+                gap: 1rem;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .container {
+            animation: fadeIn 0.5s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <header style="padding: 0.5rem 1rem; height: auto;">
+        <div style="display: flex; align-items: center; height: 100%;">
+            <button id="home-button" style="margin-right: auto;">
+                <i class="fas fa-home"></i> Home
+            </button>
+            <div style="margin-left: 30%; flex-grow: 1;">
+                <h1 style="text-align: left; margin: 0;">  📝   Set Reminders</h1>
+            </div>
+        </div>
+    </header>
+    
+
+    <main>
+        <div class="container">
+            <form id="reminder-form">
+                <div class="form-group">
+                    <label for="reminder_text">Reminder:</label>
+                    <input type="text" name="reminder_text" id="reminder_text" required placeholder="Enter reminder text">
+                </div>
+
+                <div class="form-group">
+                    <label for="due_date">Due Date:</label>
+                    <input type="date" name="due_date" id="due_date" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Priority:</label>
+                    <div class="priority-colors">
+                        <div class="priority-color" style="background-color: #e74c3c;" data-priority="high"></div>
+                        <div class="priority-color" style="background-color: #f39c12;" data-priority="medium"></div>
+                        <div class="priority-color" style="background-color: #3498db;" data-priority="low"></div>
+                    </div>
+                </div>
+
+                <button type="submit">
+                    <i class="fas fa-bell"></i> Set Reminder
+                </button>
+            </form>
+
+            <div id="success-message" class="success-message"></div>
+
+            <div class="reminders-list">
+                <h2>Your Reminders</h2>
+                <div id="reminders-container">
+                    <!-- Reminders will be dynamically added here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>This is a fictitious business and part of a university course.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('reminder-form');
+            const reminderTextInput = document.getElementById('reminder_text');
+            const dueDateInput = document.getElementById('due_date');
+            const priorityColors = document.querySelectorAll('.priority-color');
+            const remindersContainer = document.getElementById('reminders-container');
+            const successMessage = document.getElementById('success-message');
+
+            let selectedPriority = null;
+
+            const homeButton = document.getElementById('home-button');
+            
+            homeButton.addEventListener('click', function() {
+                window.location.href = 'index.html';
+            });
+    
+
+            priorityColors.forEach(color => {
+                color.addEventListener('click', function() {
+                    priorityColors.forEach(c => c.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedPriority = this.dataset.priority;
+                });
+            });
+            
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                if (!selectedPriority) {
+                    return; // hide error
+                }
+                const reminderText = reminderTextInput.value;
+                const dueDate = dueDateInput.value;
+                const priorityColor = document.querySelector('.priority-color.selected').style.backgroundColor;
+
+                const reminderData = {
+                    reminder_text: reminderText,
+                    due_date: dueDate,
+                    priority: selectedPriority
+                };
+
+                
+
+                fetch('http://localhost:8000/reminders.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(reminderData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                    addReminder(reminderText, dueDate, priorityColor);
+                    showSuccessMessage();
+                })
+                .catch(error => console.error('Error:', error));
+            });
+
+            function addReminder(text, date, color) {
+                const reminderItem = document.createElement('div');
+                reminderItem.classList.add('reminder-item');
+                reminderItem.innerHTML = `
+                    <div>
+                        <span class="priority-indicator" style="background-color: ${color};"></span>
+                        <strong>${text}</strong> - ${date}
+                    </div>
+                    <button class="delete-button">Delete</button>
+                `;
+                remindersContainer.appendChild(reminderItem);
+
+                const deleteButton = reminderItem.querySelector('.delete-button');
+                deleteButton.addEventListener('click', function() {
+                    remindersContainer.removeChild(reminderItem);
+                });
+
+                reminderTextInput.value = '';
+                dueDateInput.value = '';
+                selectedPriority = null;
+                priorityColors.forEach(c => c.classList.remove('selected'));
+            }
+
+            function showSuccessMessage() {
+                successMessage.textContent = 'Set successfully';
+                successMessage.style.display = 'block';
+                setTimeout(() => {
+                    successMessage.style.display = 'none';
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>

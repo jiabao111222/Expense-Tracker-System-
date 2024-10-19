@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" href="expenses-one-svgrepo-com.svg" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        header {
+            background-color: #3498db;
+            color: #fff;
+            text-align: center;
+            padding: 1rem;
+            position: relative; /* added for positioning */
+        }
+        .user-info {
+            position: absolute; /* positions the user info */
+            left: 20px; /* distance from left */
+            top: 20px; /* distance from top */
+            text-align: left; /* aligns text to the left */
+        }
+        h1 {
+            margin-bottom: 1rem;
+        }
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        nav ul li {
+            display: inline;
+            margin-right: 20px;
+        }
+        nav ul li a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+        nav ul li a:hover {
+            color: #ecf0f1;
+        }
+        main {
+            padding: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 5px;
+            margin-top: 2rem;
+        }
+        footer {
+            text-align: center;
+            padding: 1rem;
+            background-color: #34495e;
+            color: #ecf0f1;
+            position: relative;
+            width: 100%;
+            margin-top: 2rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #d1e7ff;
+        }
+        .reminders {
+            background-color: #ffffff;
+            border-left: 5px solid #f39c12;
+            padding: 10px;
+            margin-bottom: 1rem;
+            font-weight: bold;
+            font-size: 1.2em;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* shadow */
+        }
+        @media (max-width: 600px) {
+            nav ul li {
+                display: block;
+                margin-bottom: 10px;
+            }
+            nav ul li a {
+                display: block;
+            }
+        }
+    </style>
+    <script>
+        // Refresh the page every 8 seconds (5000 milliseconds)
+        setInterval(function() {
+            location.reload();
+        }, 8000);
+    </script>
+</head>
+<body>
+    <header>
+        <div class="user-info">
+            <span>👤User: I22022602</span> | <a href="logout.html" style="color: #fff;">Logout</a>
+        </div>
+        <h1>💹 Welcome to the Expense Tracker</h1>
+        <nav>
+            <ul>
+                <li><a href="record_expenses.html">Record Expenses</a></li>
+                <li><a href="view_expenses.html">View Expenses</a></li>
+                <li><a href="budget.html">Set Budget</a></li>
+                <li><a href="reminders.html">Set Reminders</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div style="font-size: 0.8em; text-align: right; color: #555; line-height: 1;">
+            *the page will refresh every 8 second in real-time.
+        </div>
+        
+        <h2>Track Your Expenses with Ease</h2>
+        <p>Our Expense Tracker helps you manage your finances efficiently. Start by recording your expenses, view your spending habits, set budgets, and never miss a payment with our reminder feature.</p>
+        
+        <div class="reminders">
+            ⚠️ Reminders: Always keep track of your expenses, review your budget regularly!
+        </div>
+
+        <table id="reminders-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Message</th>
+                    <th>Due Date</th>
+                    <th>Created Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- data insert -->
+            </tbody>
+        </table>
+
+        <h2>Budget Record-</h2>
+        <table id="budgets-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Budget Amount</th>
+                    <th>Budget Month</th>
+                </tr>
+            </thead>
+            <tbody>
+                 <!-- data insert -->
+            </tbody>
+        </table>
+    </main>
+
+    <footer>
+        <p>This is a fictitious business and part of a university course.</p>
+    </footer>
+
+    <script>
+        fetch('http://localhost:8000/index.php')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Data fetched:', data); // fetch
+                const tableBody = document.getElementById('reminders-table').querySelector('tbody');
+                tableBody.innerHTML = ''; // clear
+                
+                // 检查 data 是否包含 reminders
+                if (data.reminders && Array.isArray(data.reminders)) {
+                    data.reminders.forEach(reminder => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${reminder.id}</td>
+                            <td>${reminder.reminder_text}</td>
+                            <td>${reminder.due_date}</td>
+                            <td>${reminder.created_at}</td>
+                        `;
+                        tableBody.appendChild(row); // add new row
+                    });
+                } else {
+                    console.error('No reminders data found');
+                }
+            })
+            .catch(error => console.error('Error fetching data:', error));
+
+        fetch('http://localhost:8000/readbudget.php')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Data fetched:', data); 
+                const tableBody = document.getElementById('budgets-table').querySelector('tbody');
+                tableBody.innerHTML = ''; // clear
+                
+                // 检查 data 是否包含 budgets
+                if (data.budgets && Array.isArray(data.budgets)) {
+                    data.budgets.forEach(budgets => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${budgets.id}</td>
+                            <td>${budgets.budget_amount}</td>
+                            <td>${budgets.budget_month}</td>
+                        `;
+                        tableBody.appendChild(row); // new row
+                    });
+                } else {
+                    console.error('No budget data found');
+                }
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    </script>
+</body>
+</html>
